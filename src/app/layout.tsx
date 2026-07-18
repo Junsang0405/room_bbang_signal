@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Nanum_Pen_Script } from "next/font/google";
+import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,9 +13,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const nanumPenScript = Nanum_Pen_Script({
+  variable: "--font-nanum-pen",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export const metadata: Metadata = {
-  title: "Room_bbang_signal",
-  description: "choice_signal",
+  title: "Room_Bbang_Signal",
+  description: "프리미엄 업소 소개 및 초이스 플랫폼",
 };
 
 export default function RootLayout({
@@ -24,10 +31,12 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang="ko"
+      className={`${geistSans.variable} ${geistMono.variable} ${nanumPenScript.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col bg-[#0a0a0f] font-[var(--font-nanum-pen)]">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
