@@ -75,11 +75,7 @@ export default function DashboardPage() {
               Room_Bbang_Signal
             </span>
           </div>
-          <div className="hidden items-center gap-6 text-sm text-white/50 sm:flex">
-            <span className="rounded-full border border-gold-300/20 bg-gold-300/5 px-3 py-1 text-xs text-gold-300">
-              {modeLabel} 모드
-            </span>
-          </div>
+
           <button
             onClick={() => router.push(LANDING_ROUTE)}
             className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white/50 transition-all hover:border-white/20 hover:text-white"
@@ -103,9 +99,7 @@ export default function DashboardPage() {
             <h1 className="gold-shimmer text-3xl font-extrabold tracking-tight sm:text-4xl">
               출근 현황판
             </h1>
-            <p className="mt-1.5 text-sm text-white/40">
-              도파민 · 유앤미 · 사라있네(엘리트) · 달토
-            </p>
+
           </div>
         </section>
 
