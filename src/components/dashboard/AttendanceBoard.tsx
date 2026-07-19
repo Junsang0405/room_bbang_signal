@@ -2,6 +2,48 @@
 
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
+import { useAttendance } from "@/context/AttendanceContext";
+
+/* ──────────────────────── Live Clock ──────────────────────── */
+
+const WEEK_KO = ["일", "월", "화", "수", "목", "금", "토"];
+
+function LiveClock() {
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setNow(new Date());
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (!now) return null;
+
+  const year  = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day   = String(now.getDate()).padStart(2, "0");
+  const week  = WEEK_KO[now.getDay()];
+  const hh    = String(now.getHours()).padStart(2, "0");
+  const mm    = String(now.getMinutes()).padStart(2, "0");
+
+  return (
+    <div className="flex items-center gap-2 text-xs font-medium text-white/40">
+      {/* 날짜 */}
+      <span className="tabular-nums tracking-wide">
+        {year}.{month}.{day}
+      </span>
+      {/* 요일 */}
+      <span className="rounded bg-gold-300/15 px-1 py-0.5 text-[10px] font-bold text-gold-300">
+        {week}
+      </span>
+      <span className="text-white/15">|</span>
+      {/* 시간 */}
+      <span className="tabular-nums tracking-wide">
+        {hh}<span className="text-gold-300/60">:</span>{mm}
+      </span>
+    </div>
+  );
+}
 
 /* ──────────────────────── Types ──────────────────────── */
 
@@ -14,14 +56,7 @@ interface Venue {
 
 type BarMode = "attending" | "available" | "waiting";
 
-/* ──────────────────────── Data ──────────────────────── */
-
-const VENUES: Venue[] = [
-  { name: "도파민",           attending: 31, available: 18, waiting: 0 },
-  { name: "유앤미",           attending: 42, available: 27, waiting: 5 },
-  { name: "사라있네(엘리트)", attending: 63, available: 41, waiting: 12 },
-  { name: "달토",             attending: 22, available: 14, waiting: 3 },
-];
+/* (Data is now loaded from AttendanceContext — see below) */
 
 /* ──────────────────────── Animated Counter ──────────────────────── */
 
@@ -247,8 +282,12 @@ interface AttendanceBoardProps {
 
 export const AttendanceBoard = ({ onSelectVenue }: AttendanceBoardProps) => {
   const [mode, setMode] = useState<BarMode>("attending");
+  const { state } = useAttendance();
+  const venues = state.venues;
+  const updatedAt = state.updatedAt;
+  const updatedDate = state.updatedDate;
 
-  const sorted = [...VENUES].sort((a, b) => {
+  const sorted = [...venues].sort((a, b) => {
     if (mode === "waiting") {
       // 웨이팅 모드: 웨이팅 없는 업소(0)가 상단
       if (a.waiting === 0 && b.waiting > 0) return -1;
@@ -258,7 +297,7 @@ export const AttendanceBoard = ({ onSelectVenue }: AttendanceBoardProps) => {
     return b[mode] - a[mode];
   });
 
-  const maxValue = Math.max(...sorted.map((v) =>
+  const maxValue = Math.max(1, ...sorted.map((v) =>
     mode === "attending" ? v.attending
     : mode === "available" ? v.available
     : v.waiting
@@ -266,10 +305,10 @@ export const AttendanceBoard = ({ onSelectVenue }: AttendanceBoardProps) => {
 
   const displayValue =
     mode === "attending"
-      ? VENUES.reduce((s, v) => s + v.attending, 0)
+      ? venues.reduce((s, v) => s + v.attending, 0)
       : mode === "available"
-      ? VENUES.reduce((s, v) => s + v.available, 0)
-      : VENUES.filter((v) => v.waiting === 0).length;
+      ? venues.reduce((s, v) => s + v.available, 0)
+      : venues.filter((v) => v.waiting === 0).length;
 
   const displayLabel =
     mode === "attending"
@@ -285,18 +324,29 @@ export const AttendanceBoard = ({ onSelectVenue }: AttendanceBoardProps) => {
 
       {/* ── Total Big Number ── */}
       <div className="glass-card animate-fade-in-up flex flex-col items-center gap-3 rounded-3xl px-8 py-10 text-center">
-        {/* Live dot */}
-        <div className="flex items-center gap-2">
+
+        {/* 날짜/요일/시간 실시간 클록 */}
+        <LiveClock />
+
+        <div className="h-px w-16 bg-gradient-to-r from-transparent via-gold-300/20 to-transparent" />
+
+        {/* Live dot + 업데이트 타임스탬프 */}
+        <div className="flex flex-wrap items-center justify-center gap-2">
           <span className="relative flex h-2.5 w-2.5">
             <span className={cn(
               "absolute inline-flex h-full w-full animate-ping rounded-full opacity-70",
-              isWaitingMode ? "bg-green-400" : "bg-green-400"
+              "bg-green-400"
             )} />
             <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-400" />
           </span>
           <span className="text-xs font-medium tracking-widest text-white/40 uppercase">
             LIVE · 실시간 현황
           </span>
+          {updatedAt && (
+            <span className="ml-1 rounded-full border border-gold-300/20 bg-gold-300/5 px-2 py-0.5 text-[10px] text-gold-300">
+              {updatedDate} {updatedAt} 기준
+            </span>
+          )}
         </div>
 
         {/* Huge number */}

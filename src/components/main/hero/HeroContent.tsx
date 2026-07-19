@@ -205,16 +205,6 @@ export function HeroContent() {
             Room_Bbang_Signal
           </span>
         </div>
-        <div className="hidden items-center gap-8 text-sm text-white/50 sm:flex">
-          <a href="#features" className="transition-colors hover:text-gold-200">소개</a>
-          <a href="#stats" className="transition-colors hover:text-gold-200">현황</a>
-        </div>
-        <button
-          onClick={() => handleEnter("guest")}
-          className="rounded-full border border-gold-300/30 bg-gold-300/10 px-5 py-2 text-sm font-medium text-gold-200 transition-all hover:bg-gold-300/20 hover:shadow-[0_0_15px_rgba(212,169,74,0.15)]"
-        >
-          입장하기
-        </button>
       </nav>
 
       {/* ── Decorative SVGs floating ── */}

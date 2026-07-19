@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nanum_Pen_Script } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext";
+import { AttendanceProvider } from "@/context/AttendanceContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -35,7 +36,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${nanumPenScript.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#0a0a0f] font-[var(--font-nanum-pen)]">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <AttendanceProvider>{children}</AttendanceProvider>
+        </AuthProvider>
       </body>
     </html>
   );
